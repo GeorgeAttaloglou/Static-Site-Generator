@@ -1,5 +1,8 @@
+from __future__ import annotations
+
+
 class HTMLNode:
-    def __init__(self, tag:str|None = None, value:str|None = None, children:list|None = None, props:dict|None = None) -> None:
+    def __init__(self, tag:str|None = None, value:str|None = None, children:list[HTMLNode]|None = None, props:dict|None = None) -> None:
         self.tag = tag
         self.value = value
         self.children = children
@@ -28,7 +31,7 @@ class LeafNode(HTMLNode):
         super().__init__(tag, value, None, props)
 
     def to_html(self):
-        if not self.value:
+        if self.value is None:
             raise ValueError('Error: All leaf nodes must have a value')
         
         if not self.tag:

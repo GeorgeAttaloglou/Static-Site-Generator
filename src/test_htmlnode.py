@@ -78,12 +78,12 @@ class TestLeafNode(unittest.TestCase):
         with self.assertRaises(ValueError):
             node.to_html()
 
-    def test_leaf_to_html_empty_string_value_raises(self):
-        # Note: because to_html() checks `if not self.value`, an empty
-        # string is treated the same as no value at all.
-        node = LeafNode("p", "")
-        with self.assertRaises(ValueError):
-            node.to_html()
+    def test_leaf_to_html_empty_string_value_is_valid(self):
+        # Regression test: empty string is a legitimate value (e.g. an
+        # <img> tag's content is always empty), so it must NOT raise.
+        # Only a genuinely missing (None) value should raise.
+        node = LeafNode("img", "", {"src": "https://a.com/i.png"})
+        self.assertEqual(node.to_html(), '<img src="https://a.com/i.png"></img>')
 
     def test_leaf_children_is_always_none(self):
         node = LeafNode("p", "text")
@@ -163,3 +163,12 @@ class TestParentNode(unittest.TestCase):
             repr(node),
             f"HTMLNode(div, None, {[child]}, {{'class': 'wrapper'}})",
         )
+
+    def test_to_html_currently_ignores_own_props(self):
+        # KNOWN QUIRK: ParentNode.to_html() never calls prop_to_html(), so
+        # any props passed to a ParentNode are silently dropped from the
+        # rendered output. This test documents that *current* behavior.
+        # If props support gets added to ParentNode later, this test
+        # should be updated (and will start failing) as a signal.
+        node = ParentNode("div", [LeafNode("span", "child")], {"class": "wrapper"})
+        self.assertEqual(node.to_html(), "<div><span>child</span></div>")
