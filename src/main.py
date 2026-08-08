@@ -1,8 +1,8 @@
-from textnode import TextNode,TextType
 import os
 import shutil
+from generate_page import generate_page
 
-def copy_dir_to_public() -> None:
+def copy_static_to_public() -> None:
     source_dir = 'static'
     destination_dir = 'public'
     if not os.path.exists(source_dir):
@@ -12,3 +12,10 @@ def copy_dir_to_public() -> None:
 
     # copy contents of source into destination
     shutil.copytree(source_dir, destination_dir)
+
+def main():
+    copy_static_to_public()
+
+    generate_page("content/index.md", "template.html", "public/index.html")
+
+main()
