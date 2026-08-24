@@ -1,21 +1,48 @@
 import os
 import shutil
+
 from generate_page import generate_page
 
+SOURCE_DIR = "static"
+DESTINATION_DIR = "public"
+CONTENT_DIR = "content"
+TEMPLATE_PATH = "template.html"
+
+
 def copy_static_to_public() -> None:
-    source_dir = 'static'
-    destination_dir = 'public'
-    if not os.path.exists(source_dir):
-        raise Exception('Error: Invalid source directory')
-    if os.path.exists(destination_dir):
-        shutil.rmtree(destination_dir)
+    """Wipe the public directory and replace it with a fresh copy of static."""
+    if not os.path.exists(SOURCE_DIR):
+        raise Exception("Error: Invalid source directory")
 
-    # copy contents of source into destination
-    shutil.copytree(source_dir, destination_dir)
+    if os.path.exists(DESTINATION_DIR):
+        shutil.rmtree(DESTINATION_DIR)
 
-def main():
+    shutil.copytree(SOURCE_DIR, DESTINATION_DIR)
+
+
+def generate_pages_recursive(
+    source_dir_path: str = CONTENT_DIR,
+    dest_dir_path: str = DESTINATION_DIR,
+) -> None:
+    
+    """Mirror the content directory structure into public, generating an
+    .html page (via the template) for every markdown file found."""
+    for entry in os.listdir(source_dir_path):
+        source_path = os.path.join(source_dir_path, entry)
+        dest_path = os.path.join(dest_dir_path, entry)
+
+        if os.path.isdir(source_path):
+            os.makedirs(dest_path, exist_ok=True)
+            generate_pages_recursive(source_path, dest_path)
+        else:
+            dest_path = dest_path.replace(".md", ".html")
+            generate_page(source_path, TEMPLATE_PATH, dest_path)
+
+
+def main() -> None:
     copy_static_to_public()
+    generate_pages_recursive()
 
-    generate_page("content/index.md", "template.html", "public/index.html")
 
-main()
+if __name__ == "__main__":
+    main()
