@@ -35,14 +35,15 @@ def generate_pages_recursive(
 
         if os.path.isdir(source_path):
             os.makedirs(dest_path, exist_ok=True)
-            generate_pages_recursive(source_path, dest_path)
+            generate_pages_recursive(basepath, source_path, dest_path)
         else:
             dest_path = dest_path.replace(".md", ".html")
             generate_page(source_path, TEMPLATE_PATH, dest_path, basepath)
 
 
 def main(basepath: str="/") -> None:
-    basepath = sys.argv[1]
+    if len(sys.argv) > 1:
+        basepath = sys.argv[1]
     copy_static_to_public()
     generate_pages_recursive(basepath)
 
