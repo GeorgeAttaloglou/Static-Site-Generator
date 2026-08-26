@@ -1,10 +1,11 @@
 import os
 import shutil
+import sys
 
 from generate_page import generate_page
 
 SOURCE_DIR = "static"
-DESTINATION_DIR = "public"
+DESTINATION_DIR = "docs"
 CONTENT_DIR = "content"
 TEMPLATE_PATH = "template.html"
 
@@ -21,6 +22,7 @@ def copy_static_to_public() -> None:
 
 
 def generate_pages_recursive(
+    basepath: str,
     source_dir_path: str = CONTENT_DIR,
     dest_dir_path: str = DESTINATION_DIR,
 ) -> None:
@@ -36,12 +38,13 @@ def generate_pages_recursive(
             generate_pages_recursive(source_path, dest_path)
         else:
             dest_path = dest_path.replace(".md", ".html")
-            generate_page(source_path, TEMPLATE_PATH, dest_path)
+            generate_page(source_path, TEMPLATE_PATH, dest_path, basepath)
 
 
-def main() -> None:
+def main(basepath: str="/") -> None:
+    basepath = sys.argv[1]
     copy_static_to_public()
-    generate_pages_recursive()
+    generate_pages_recursive(basepath)
 
 
 if __name__ == "__main__":

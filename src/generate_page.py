@@ -2,7 +2,7 @@ import os
 from markdown_to_html_node import markdown_to_html_node
 from extract_title import extract_title
 
-def generate_page(from_path:str, template_path:str, dest_path:str) -> None:
+def generate_page(from_path:str, template_path:str, dest_path:str, basepath: str) -> None:
     if not os.path.exists(from_path):
         raise FileNotFoundError("Error: from_path not found")
 
@@ -29,6 +29,8 @@ def generate_page(from_path:str, template_path:str, dest_path:str) -> None:
 
     template_contents = template_contents.replace("{{ Title }}", title_of_page)
     template_contents = template_contents.replace("{{ Content }}", html_from_markdown)
+    template_contents = template_contents.replace('href="/', f'href="{basepath}')
+    template_contents = template_contents.replace('src="/', f'src="{basepath}')
 
     with open(dest_path, "w") as file:
         file.write(template_contents)
